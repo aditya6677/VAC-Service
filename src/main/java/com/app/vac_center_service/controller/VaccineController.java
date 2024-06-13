@@ -6,6 +6,7 @@ import com.app.vac_center_service.custom.CustomResponse;
 import com.app.vac_center_service.entity.CitizenEntity;
 import com.app.vac_center_service.entity.VCenterEntity;
 import com.app.vac_center_service.repository.VCenterRepo;
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -36,12 +37,20 @@ public class VaccineController {
     }
 
     @GetMapping("/list/{id}")
+    @HystrixCommand(fallbackMethod = "getVaccineByIdFallback")
     public ResponseEntity<CustomResponse> getVaccineById(@PathVariable Long id) {
         CustomResponse customResponse = new CustomResponse();
         VCenterEntity vCenterEntity = vCenterRepo.findById(id).get();
         customResponse.setVCenterEntity(vCenterEntity);
-        List<CitizenEntity> citizenEntityList = restTemplate.getForObject("http://localhost:8081/citizen/vid/" + id, List.class);
+        List<CitizenEntity> citizenEntityList = restTemplate.getForObject("http://CITIZEN-SERVICE/citizen/vid/" + id, List.class);
         customResponse.setCitizenEntity(citizenEntityList);
+        return new ResponseEntity<>(customResponse, HttpStatus.OK);
+    }
+
+    public ResponseEntity<CustomResponse> getVaccineByIdFallback(@PathVariable Long id){
+        CustomResponse customResponse = new CustomResponse();
+        VCenterEntity vCenterEntity = vCenterRepo.findById(id).get();
+        customResponse.setVCenterEntity(vCenterEntity);
         return new ResponseEntity<>(customResponse, HttpStatus.OK);
     }
 

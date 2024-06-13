@@ -1,6 +1,6 @@
 spring:
   application:
-    name: VAC_SERVICE
+    name: VAC-SERVICE
   datasource:
     url: 'jdbc:h2:file:~/spring-boot-h2-db-vac'
     driverClassName: org.h2.Driver
