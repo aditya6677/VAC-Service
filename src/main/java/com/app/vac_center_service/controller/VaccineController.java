@@ -17,6 +17,9 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/vac")
@@ -32,8 +35,11 @@ public class VaccineController {
     }
 
     @GetMapping("/list")
-    public ResponseEntity<List<VCenterEntity>> getAllVaccines() {
-        return new ResponseEntity<>(vCenterRepo.findAll(), HttpStatus.OK);
+    public ResponseEntity<Map<String, Set<VCenterEntity>>> getAllVaccines() {
+        Map<String, Set<VCenterEntity>> map = vCenterRepo.findAll().stream().collect(Collectors.groupingBy(VCenterEntity::getAddress, Collectors.toSet()));
+        return new ResponseEntity<>(map, HttpStatus.OK);
+        //System.out.println(map);
+        //return new ResponseEntity<>(vCenterRepo.findAll(), HttpStatus.OK);
     }
 
     @GetMapping("/list/{id}")
